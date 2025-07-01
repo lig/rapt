@@ -1,0 +1,74 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: tools.rapt.dev
+spec:
+  group: rapt.dev
+  scope: Namespaced
+  names:
+    plural: tools
+    singular: tool
+    kind: Tool
+
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - jobTemplate
+              properties:
+                help:
+                  type: string
+                  description: |
+                    A help message to show with 'rapt help <tool>'.
+                arguments:
+                  type: array
+                  description: |
+                    A list of arguments that the tool accepts, to validate and help render usage.
+                  items:
+                    type: object
+                    required:
+                      - name
+                    properties:
+                      name:
+                        type: string
+                      description:
+                        type: string
+                      required:
+                        type: boolean
+                        default: false
+                      default:
+                        type: string
+                jobTemplate:
+                  type: object
+                  required:
+                    - image
+                  properties:
+                    image:
+                      type: string
+                      description: "Container image to run."
+                    command:
+                      type: array
+                      items:
+                        type: string
+                      description: "Command to run (overrides ENTRYPOINT)."
+                    env:
+                      type: array
+                      description: "List of environment variables to set for each run of the tool."
+                      items:
+                        type: object
+                        required:
+                          - name
+                        properties:
+                          name:
+                            type: string
+                            description: "Environment variable name."
+                          value:
+                            type: string
+                            description: "Environment variable value."

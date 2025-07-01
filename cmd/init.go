@@ -1,0 +1,47 @@
+/*
+Copyright © 2025 Serge Matveenko <lig@countzero.co>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+package cmd
+
+import (
+	"codeberg.org/lig/rapt/internal/app/rapt"
+	"github.com/spf13/cobra"
+)
+
+var namespace string
+
+// initCmd represents the init command
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Install the Rapt CRD in your Kubernetes cluster.",
+	Long: `Initialize your Kubernetes cluster for use with Rapt by installing the Rapt CustomResourceDefinition (CRD).
+
+This command sets up the necessary CRD so that Rapt can manage and orchestrate predefined jobs (commands) in your cluster. Run this command once per cluster before using other Rapt features.`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return rapt.InitCmd(namespace)
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(initCmd)
+
+	initCmd.Flags().StringVarP(&namespace, "namespace", "n", "", "The namespace to install the Rapt CRD into")
+}
