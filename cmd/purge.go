@@ -29,13 +29,13 @@ import (
 // purgeCmd represents the purge command
 var purgeCmd = &cobra.Command{
 	Use:   "purge",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Remove the Rapt CRD and all associated resources from your Kubernetes cluster.",
+	Long: `Purge all Rapt-related resources from your Kubernetes cluster, including the Rapt CustomResourceDefinition (CRD).
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+This command is useful for cleanup purposes when you no longer wish to use Rapt in a given cluster. 
+It will remove the CRD and all associated custom resources managed by Rapt.
+
+⚠️ Warning: This operation is destructive and cannot be undone. Ensure you have backups if needed before proceeding.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return rapt.Purge(namespace)
 	},
@@ -43,14 +43,4 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(purgeCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// purgeCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// purgeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
