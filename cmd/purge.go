@@ -26,18 +26,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// initCmd represents the init command
-var initCmd = &cobra.Command{
-	Use:   "init",
-	Short: "Install the Rapt CRD in your Kubernetes cluster.",
-	Long: `Initialize your Kubernetes cluster for use with Rapt by installing the Rapt CustomResourceDefinition (CRD).
+// purgeCmd represents the purge command
+var purgeCmd = &cobra.Command{
+	Use:   "purge",
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines and likely contains examples
+and usage of using your command. For example:
 
-This command sets up the necessary CRD so that Rapt can manage and orchestrate predefined jobs (commands) in your cluster. Run this command once per cluster before using other Rapt features.`,
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return rapt.InitCmd(namespace)
+		return rapt.Purge(namespace)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(purgeCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// purgeCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// purgeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

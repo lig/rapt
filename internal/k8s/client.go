@@ -12,6 +12,7 @@ import (
 func InitClient(namespace string) (*clientset.Clientset, error) {
 	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 	configOverrides := &clientcmd.ConfigOverrides{}
+	configOverrides.Context.Namespace = namespace
 	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
 
 	config, err := kubeConfig.ClientConfig()
@@ -26,14 +27,12 @@ func InitClient(namespace string) (*clientset.Clientset, error) {
 
 	cluster := config.Host
 
-	if namespace == "" {
-		namespace, _, err = kubeConfig.Namespace()
-	}
+	namespace, _, err = kubeConfig.Namespace()
 	if err != nil {
 		return nil, err
 	}
 	if namespace == "" {
-		namespace = "default"
+		namespace = "unknown"
 	}
 
 	prompt := &survey.Confirm{
