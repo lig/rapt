@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 	
 	"codeberg.org/lig/rapt/internal/app/rapt"
 	"github.com/spf13/cobra"
@@ -31,6 +32,7 @@ import (
 var (
 	runArgs    []string
 	runEnv     []string
+	runMounts  []string
 	runWait    bool
 	runFollow  bool
 	runTimeout int
@@ -45,11 +47,16 @@ var runCmd = &cobra.Command{
 This command creates a Kubernetes Job that runs the specified tool with the given arguments and environment variables.
 Logs are streamed in real-time by default, making it feel like running a local command.
 
+You can mount local files into the job container using the --mount flag with the format:
+local-path:container-path
+
 Examples:
   rapt run echo-tool --arg message="Hello World"
   rapt run db-migrate --arg database=production --arg script=migration.sql
   rapt run file-processor --env DEBUG=true
-  rapt run my-tool --arg input=file.txt --arg output=result.txt`,
+  rapt run my-tool --arg input=/tmp/data.json --arg output=result.txt --mount ./data.json:/tmp/data.json --mount ./config.yaml:/etc/config.yaml
+  rapt run script-runner --mount ./script.sh:/app/script.sh --arg script=/app/script.sh --env DEBUG=true
+  rapt run data-processor --mount ./input.csv:/data/input.csv --mount ./schema.json:/app/schema.json --arg input=/data/input.csv --arg schema=/app/schema.json --arg format=json`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		toolName := args[0]
@@ -74,7 +81,20 @@ Examples:
 			envMap[parts[0]] = parts[1]
 		}
 		
-		return rapt.RunTool(namespace, toolName, argMap, envMap, runWait, runFollow, runTimeout)
+		// Parse mount specifications
+		mounts := make([]rapt.MountSpec, len(runMounts))
+		for i, mount := range runMounts {
+			parts := strings.Split(mount, ":")
+			if len(parts) != 2 {
+				return fmt.Errorf("invalid mount format: %s (expected local-path:container-path)", mount)
+			}
+			mounts[i] = rapt.MountSpec{
+				LocalPath:     strings.TrimSpace(parts[0]),
+				ContainerPath: strings.TrimSpace(parts[1]),
+			}
+		}
+		
+		return rapt.RunTool(namespace, toolName, argMap, envMap, mounts, runWait, runFollow, runTimeout)
 	},
 }
 
