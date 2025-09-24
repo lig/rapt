@@ -2,7 +2,6 @@
 
 [![Go Version](https://img.shields.io/badge/go-1.24+-blue.svg)](https://golang.org/dl/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://github.com/lig/rapt/workflows/CI/badge.svg)](https://github.com/lig/rapt/actions)
 
 Rapt (from pronunciation of "wrapped") is a CLI utility written in Go that orchestrates running predefined jobs (commands or tools) in a Kubernetes environment.
 
