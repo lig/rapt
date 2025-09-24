@@ -4,20 +4,30 @@ This document outlines the future development plans for the Rapt project.
 
 ## 🚀 Development Roadmap
 
-### Phase 1: Enhanced Monitoring & Debugging (High Priority)
-- [ ] **`rapt logs`** - View job execution logs
-  ```bash
-  rapt logs <tool-name> [--follow] [--namespace <ns>]
-  ```
-  - Show logs from tool executions
-  - Support real-time log following
-  - Filter logs by job status
+### Phase 1: Enhanced Job Management (High Priority)
+- [ ] **Job Failure Analysis & Retry Logic**
+  - Automatic retry for failed jobs
+  - Failure reason analysis and reporting
+  - Configurable retry policies
+  - Dead letter queue for permanently failed jobs
 
-- [ ] **Enhanced Job Management**
-  - Job status tracking and history
-  - Job failure analysis and retry logic
-  - Resource usage monitoring
-  - Job cleanup automation
+- [ ] **Resource Usage Monitoring**
+  - CPU and memory usage tracking
+  - Resource limit recommendations
+  - Performance metrics collection
+  - Cost analysis and optimization
+
+- [ ] **Job Cleanup Automation**
+  - Configurable cleanup policies
+  - Automatic cleanup of old jobs
+  - Cleanup based on job status and age
+  - Manual cleanup commands
+
+- [ ] **Job Scheduling & Queuing**
+  - Job scheduling with cron-like syntax
+  - Priority-based job queuing
+  - Resource-aware scheduling
+  - Job dependencies and workflows
 
 ### Phase 2: Advanced Tool Features (Medium Priority)
 - [ ] **Tool Templates & Sharing**
@@ -108,4 +118,4 @@ This document outlines the future development plans for the Rapt project.
 
 **Last Updated**: January 2025  
 **Status**: Post-MVP Development Phase  
-**Next Milestone**: Enhanced monitoring with `rapt logs` command
+**Next Milestone**: Job failure analysis and retry logic

@@ -180,11 +180,13 @@ Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTIN
 
 ## Roadmap
 
-- [ ] Tool execution and job management
-- [ ] Tool templates and sharing
-- [ ] Web UI for tool management
-- [ ] Integration with popular CI/CD systems
-- [ ] Tool marketplace
+For detailed development plans and future features, see our [ROADMAP.md](ROADMAP.md).
+
+**Recent Achievements:**
+- ✅ Complete MVP functionality with all essential commands
+- ✅ Real-time log streaming in `rapt run`
+- ✅ Comprehensive job log management with `rapt logs`
+- ✅ Enhanced job naming with readable timestamps
 
 ---
 
