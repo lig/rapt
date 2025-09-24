@@ -7,6 +7,7 @@ import (
 
 	clientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -70,4 +71,24 @@ func InitDynamicClient(namespace string) (dynamic.Interface, error) {
 	}
 
 	return dynClient, nil
+}
+
+// InitKubernetesClient initializes and returns a regular Kubernetes client for Jobs, Pods, etc.
+func InitKubernetesClient(namespace string) (*kubernetes.Clientset, error) {
+	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+	configOverrides := &clientcmd.ConfigOverrides{}
+	configOverrides.Context.Namespace = namespace
+	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
+
+	config, err := kubeConfig.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	k8sClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, err
+	}
+
+	return k8sClient, nil
 }
