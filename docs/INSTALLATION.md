@@ -45,7 +45,7 @@ Move-Item "rapt.exe" "C:\Windows\System32\"
 ### 2. Go Install
 
 ```bash
-go install codeberg.org/lig/rapt@main
+go install codeberg.org/lig/rapt@latest
 ```
 
 ### 3. Build from Source
@@ -195,7 +195,7 @@ go build -ldflags="-X 'codeberg.org/lig/rapt/cmd.Version=dev' -X 'codeberg.org/l
 2. **Download new version**:
    ```bash
    # Using go install
-   go install codeberg.org/lig/rapt@main
+   go install codeberg.org/lig/rapt@latest
    
    # Or download binary
    curl -L https://codeberg.org/lig/rapt/releases/download/v1.1.0/rapt-v1.1.0-linux-amd64.tar.gz | tar -xz
