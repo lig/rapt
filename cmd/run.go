@@ -103,6 +103,7 @@ func init() {
 
 	runCmd.Flags().StringArrayVarP(&runArgs, "arg", "a", nil, "Tool argument in the form key=value. Can be specified multiple times.")
 	runCmd.Flags().StringArrayVarP(&runEnv, "env", "e", nil, "Environment variable in the form key=value. Can be specified multiple times.")
+	runCmd.Flags().StringArrayVarP(&runMounts, "mount", "m", nil, "Mount local file into container in the form local-path:container-path. Can be specified multiple times.")
 	runCmd.Flags().BoolVarP(&runWait, "wait", "w", false, "Wait for the job to complete before exiting (logs are always shown)")
 	runCmd.Flags().BoolVarP(&runFollow, "follow", "f", false, "Follow job logs in real-time (default behavior)")
 	runCmd.Flags().IntVarP(&runTimeout, "timeout", "t", 300, "Timeout in seconds when waiting for job completion (0 = no timeout)")
