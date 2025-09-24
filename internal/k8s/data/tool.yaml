@@ -23,28 +23,6 @@ spec:
               required:
                 - jobTemplate
               properties:
-                help:
-                  type: string
-                  description: |
-                    A help message to show with 'rapt help <tool>'.
-                arguments:
-                  type: array
-                  description: |
-                    A list of arguments that the tool accepts, to validate and help render usage.
-                  items:
-                    type: object
-                    required:
-                      - name
-                    properties:
-                      name:
-                        type: string
-                      description:
-                        type: string
-                      required:
-                        type: boolean
-                        default: false
-                      default:
-                        type: string
                 jobTemplate:
                   type: object
                   required:

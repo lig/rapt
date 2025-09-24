@@ -22,36 +22,51 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
+	"errors"
+	"strings"
 
+	"codeberg.org/lig/rapt/internal/app/rapt"
 	"github.com/spf13/cobra"
+)
+
+// Add command flags
+var (
+	addName    string
+	addImage   string
+	addCommand string
+	addEnv     []string
 )
 
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Add a new tool definition to your Kubernetes cluster.",
+	Long: `Add a tool (containerized job/command) to the Rapt system in your Kubernetes cluster.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("add called")
+This command registers a new tool by specifying its container image, the command to run inside the image, and (optionally) a set of environment variables.
+
+Examples:
+  rapt add -t lstool -i alpine --command "ls -la"
+  rapt add --name echo --image busybox -e FOO=bar -e BAZ=qux --command "echo $FOO $BAZ"
+`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		for _, e := range addEnv {
+			parts := strings.SplitN(e, "=", 2)
+			if len(parts) != 2 || strings.TrimSpace(parts[0]) == "" {
+				return errors.New("each --env/-e argument must be in NAME=VALUE format")
+			}
+		}
+		return rapt.Add(namespace, addName, addImage, addCommand, addEnv)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(addCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// addCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	addCmd.Flags().StringVarP(&addName, "name", "t", "", "(Required) Tool name.")
+	addCmd.MarkFlagRequired("name")
+	addCmd.Flags().StringVarP(&addImage, "image", "i", "", "(Required) Container image to run.")
+	addCmd.MarkFlagRequired("image")
+	addCmd.Flags().StringVarP(&addCommand, "command", "c", "", "Command to run (overrides ENTRYPOINT). Specify as a single string.")
+	addCmd.Flags().StringArrayVarP(&addEnv, "env", "e", nil, "Environment variable in the form NAME=VALUE. Can be specified multiple times.")
 }
