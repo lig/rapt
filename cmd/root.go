@@ -31,8 +31,9 @@ var namespace string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "rapt",
-	Short: "Rapt is a CLI utility for orchestrating predefined jobs in Kubernetes.",
+	Use:     "rapt",
+	Version: Version,
+	Short:   "Rapt is a CLI utility for orchestrating predefined jobs in Kubernetes.",
 	Long: `Rapt (from pronunciation of "wrapped") is a CLI utility written in Go that orchestrates running predefined jobs (commands or tools) in a Kubernetes environment.
 
 Rapt enables you to define, manage, and execute jobs in Kubernetes clusters using a simple command-line interface. It is designed to streamline workflows by providing a consistent and extensible way to run and manage containerized tasks.

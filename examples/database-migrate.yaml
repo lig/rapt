@@ -1,0 +1,28 @@
+apiVersion: rapt.dev/v1alpha1
+kind: Tool
+metadata:
+  name: db-migrate
+  namespace: default
+spec:
+  help: "Run database migrations using Flyway"
+  arguments:
+    - name: "database"
+      description: "Database name to migrate"
+      required: true
+    - name: "script"
+      description: "Path to migration script"
+      required: true
+    - name: "environment"
+      description: "Target environment (dev, staging, prod)"
+      required: false
+      default: "dev"
+  jobTemplate:
+    image: "flyway/flyway:latest"
+    command: ["flyway", "migrate"]
+    env:
+      - name: "FLYWAY_URL"
+        value: "jdbc:postgresql://db-service:5432"
+      - name: "FLYWAY_USER"
+        value: "migrator"
+      - name: "FLYWAY_PASSWORD"
+        value: "secret"

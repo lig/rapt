@@ -1,0 +1,21 @@
+apiVersion: rapt.dev/v1alpha1
+kind: Tool
+metadata:
+  name: echo-tool
+  namespace: default
+spec:
+  help: "Echo a message to stdout"
+  arguments:
+    - name: "message"
+      description: "The message to echo"
+      required: true
+    - name: "repeat"
+      description: "Number of times to repeat the message"
+      required: false
+      default: "1"
+  jobTemplate:
+    image: "alpine:latest"
+    command: ["sh", "-c"]
+    env:
+      - name: "MESSAGE"
+        value: "Hello from echo-tool!"

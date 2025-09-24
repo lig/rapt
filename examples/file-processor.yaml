@@ -1,0 +1,32 @@
+apiVersion: rapt.dev/v1alpha1
+kind: Tool
+metadata:
+  name: file-processor
+  namespace: default
+spec:
+  help: "Process files with various operations (compress, encrypt, convert)"
+  arguments:
+    - name: "operation"
+      description: "Operation to perform (compress, encrypt, convert)"
+      required: true
+    - name: "input-file"
+      description: "Path to input file"
+      required: true
+    - name: "output-file"
+      description: "Path to output file"
+      required: false
+      default: "output"
+    - name: "algorithm"
+      description: "Algorithm to use (gzip, aes256, jpeg)"
+      required: false
+      default: "gzip"
+  jobTemplate:
+    image: "alpine:latest"
+    command: ["sh", "-c", "echo 'Processing file with operation: $OPERATION'"]
+    env:
+      - name: "OPERATION"
+        value: "compress"
+      - name: "INPUT_FILE"
+        value: "/data/input"
+      - name: "OUTPUT_FILE"
+        value: "/data/output"

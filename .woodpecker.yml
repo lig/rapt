@@ -1,0 +1,83 @@
+pipeline:
+  test:
+    image: golang:1.24-alpine
+    commands:
+      - apk add --no-cache git
+      - go mod download
+      - go mod verify
+      - go test -v ./...
+      - go vet ./...
+      - go fmt -s -l . | tee /tmp/fmt.out
+      - |
+        if [ -s /tmp/fmt.out ]; then
+          echo "The following files are not formatted:"
+          cat /tmp/fmt.out
+          exit 1
+        fi
+    when:
+      event: [push, pull_request]
+
+  lint:
+    image: golangci/golangci-lint:latest
+    commands:
+      - golangci-lint run
+    when:
+      event: [push, pull_request]
+
+  build:
+    image: golang:1.24-alpine
+    commands:
+      - apk add --no-cache git
+      - go build -v -ldflags="-X 'codeberg.org/lig/rapt/cmd.Version=${CI_COMMIT_TAG:-dev}' -X 'codeberg.org/lig/rapt/cmd.Commit=${CI_COMMIT_SHA}' -X 'codeberg.org/lig/rapt/cmd.BuildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)'" -o rapt main.go
+      - ./rapt version
+    when:
+      event: [push, pull_request, tag]
+
+  build-matrix:
+    matrix:
+      GOOS: [linux, darwin, windows]
+      GOARCH: [amd64, arm64]
+    image: golang:1.24-alpine
+    commands:
+      - apk add --no-cache git
+      - export GOOS=${GOOS} GOARCH=${GOARCH}
+      - go build -v -ldflags="-X 'codeberg.org/lig/rapt/cmd.Version=${CI_COMMIT_TAG:-dev}' -X 'codeberg.org/lig/rapt/cmd.Commit=${CI_COMMIT_SHA}' -X 'codeberg.org/lig/rapt/cmd.BuildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)'" -o rapt-${GOOS}-${GOARCH} main.go
+      - ls -la rapt-${GOOS}-${GOARCH}
+    when:
+      event: [tag]
+
+  release:
+    image: alpine:latest
+    commands:
+      - apk add --no-cache git curl
+      - |
+        # Create release directory
+        mkdir -p release
+        
+        # Download artifacts from build-matrix
+        for artifact in rapt-linux-amd64 rapt-linux-arm64 rapt-darwin-amd64 rapt-darwin-arm64 rapt-windows-amd64 rapt-windows-arm64; do
+          curl -L -o "release/${artifact}" "${CI_SYSTEM_URL}/api/v1/repos/${CI_REPO}/artifacts/${CI_PIPELINE}/${artifact}"
+        done
+        
+        # Create archives
+        cd release
+        tar -czf rapt-${CI_COMMIT_TAG}-linux-amd64.tar.gz rapt-linux-amd64
+        tar -czf rapt-${CI_COMMIT_TAG}-linux-arm64.tar.gz rapt-linux-arm64
+        tar -czf rapt-${CI_COMMIT_TAG}-darwin-amd64.tar.gz rapt-darwin-amd64
+        tar -czf rapt-${CI_COMMIT_TAG}-darwin-arm64.tar.gz rapt-darwin-arm64
+        zip rapt-${CI_COMMIT_TAG}-windows-amd64.zip rapt-windows-amd64
+        zip rapt-${CI_COMMIT_TAG}-windows-arm64.zip rapt-windows-arm64
+        
+        # Upload to release
+        curl -X POST \
+          -H "Authorization: Bearer ${CI_TOKEN}" \
+          -F "file=@rapt-${CI_COMMIT_TAG}-linux-amd64.tar.gz" \
+          -F "file=@rapt-${CI_COMMIT_TAG}-linux-arm64.tar.gz" \
+          -F "file=@rapt-${CI_COMMIT_TAG}-darwin-amd64.tar.gz" \
+          -F "file=@rapt-${CI_COMMIT_TAG}-darwin-arm64.tar.gz" \
+          -F "file=@rapt-${CI_COMMIT_TAG}-windows-amd64.zip" \
+          -F "file=@rapt-${CI_COMMIT_TAG}-windows-arm64.zip" \
+          "${CI_SYSTEM_URL}/api/v1/repos/${CI_REPO}/releases/${CI_COMMIT_TAG}/assets"
+    when:
+      event: tag
+    depends_on: [build-matrix]
