@@ -31,7 +31,7 @@ sudo mv rapt /usr/local/bin/
 ### Using Go Install
 
 ```bash
-go install codeberg.org/lig/rapt@latest
+go install codeberg.org/lig/rapt@main
 ```
 
 ## Quick Start
