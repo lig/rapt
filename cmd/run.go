@@ -43,12 +43,13 @@ var runCmd = &cobra.Command{
 	Long: `Execute a tool by creating a Kubernetes Job from the tool definition.
 
 This command creates a Kubernetes Job that runs the specified tool with the given arguments and environment variables.
+Logs are streamed in real-time by default, making it feel like running a local command.
 
 Examples:
   rapt run echo-tool --arg message="Hello World"
   rapt run db-migrate --arg database=production --arg script=migration.sql
-  rapt run file-processor --env DEBUG=true --wait
-  rapt run my-tool --arg input=file.txt --arg output=result.txt --follow`,
+  rapt run file-processor --env DEBUG=true
+  rapt run my-tool --arg input=file.txt --arg output=result.txt`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		toolName := args[0]
@@ -82,8 +83,8 @@ func init() {
 
 	runCmd.Flags().StringArrayVarP(&runArgs, "arg", "a", nil, "Tool argument in the form key=value. Can be specified multiple times.")
 	runCmd.Flags().StringArrayVarP(&runEnv, "env", "e", nil, "Environment variable in the form key=value. Can be specified multiple times.")
-	runCmd.Flags().BoolVarP(&runWait, "wait", "w", false, "Wait for the job to complete before exiting")
-	runCmd.Flags().BoolVarP(&runFollow, "follow", "f", false, "Follow job logs in real-time (implies --wait)")
+	runCmd.Flags().BoolVarP(&runWait, "wait", "w", false, "Wait for the job to complete before exiting (logs are always shown)")
+	runCmd.Flags().BoolVarP(&runFollow, "follow", "f", false, "Follow job logs in real-time (default behavior)")
 	runCmd.Flags().IntVarP(&runTimeout, "timeout", "t", 300, "Timeout in seconds when waiting for job completion (0 = no timeout)")
 }
 
