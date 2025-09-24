@@ -1,164 +1,111 @@
-# TODO - MVP Implementation
+# TODO - Rapt Project Roadmap
 
-This document outlines the essential commands and functionality needed to achieve MVP (Minimum Viable Product) status for the Rapt project.
+This document outlines the future development plans for the Rapt project.
 
-## 🎯 Current State Analysis
+## 🚀 Development Roadmap
 
-**✅ Already Implemented:**
-- `rapt init` - Install CRD in cluster
-- `rapt add` - Add tool definitions  
-- `rapt purge` - Remove CRD and resources
-- `rapt version` - Show version information
+### Phase 1: Enhanced Monitoring & Debugging (High Priority)
+- [ ] **`rapt logs`** - View job execution logs
+  ```bash
+  rapt logs <tool-name> [--follow] [--namespace <ns>]
+  ```
+  - Show logs from tool executions
+  - Support real-time log following
+  - Filter logs by job status
 
-**❌ Missing for MVP:**
+- [ ] **Enhanced Job Management**
+  - Job status tracking and history
+  - Job failure analysis and retry logic
+  - Resource usage monitoring
+  - Job cleanup automation
 
-## 🚀 Essential MVP Commands
+### Phase 2: Advanced Tool Features (Medium Priority)
+- [ ] **Tool Templates & Sharing**
+  - Pre-built tool templates
+  - Tool sharing between namespaces/clusters
+  - Tool marketplace/registry integration
+  - Tool versioning and updates
 
-### 1. **`rapt list`** - List Available Tools
-```bash
-rapt list [--namespace <ns>]
-```
-**Purpose**: Show all registered tools in the cluster
-**Implementation**: Query Kubernetes for Tool CRDs
-**Priority**: High
+- [ ] **Advanced Configuration**
+  - Configuration file support (YAML/JSON)
+  - Tool profiles and environments
+  - Secret management integration
+  - Resource limits and requests
 
-### 2. **`rapt run <tool-name>`** - Execute Tools ⭐ **CRITICAL**
-```bash
-rapt run <tool-name> [--arg key=value] [--namespace <ns>]
-```
-**Purpose**: Actually execute the tools (the core functionality!)
-**Implementation**: Create Kubernetes Jobs from Tool definitions
-**Priority**: Critical
+- [ ] **Tool Validation & Security**
+  - Image security scanning
+  - Tool definition validation
+  - RBAC integration
+  - Network policies support
 
-### 3. **`rapt delete <tool-name>`** - Remove Tools
-```bash
-rapt delete <tool-name> [--namespace <ns>]
-```
-**Purpose**: Remove tool definitions from cluster
-**Implementation**: Delete Tool CRDs
-**Priority**: High
+### Phase 3: Developer Experience (Medium Priority)
+- [ ] **Enhanced CLI Features**
+  - Tab completion support
+  - Interactive tool creation wizard
+  - Progress indicators for long operations
+  - Better error messages and suggestions
 
-### 4. **`rapt describe <tool-name>`** - Show Tool Details
-```bash
-rapt describe <tool-name> [--namespace <ns>]
-```
-**Purpose**: Show detailed information about a specific tool
-**Implementation**: Get and format Tool CRD details
-**Priority**: Medium
+- [ ] **Development Tools**
+  - Tool testing framework
+  - Local development mode
+  - Debug mode for troubleshooting
+  - Performance profiling
 
-### 5. **`rapt status`** - Cluster Status
-```bash
-rapt status [--namespace <ns>]
-```
-**Purpose**: Show Rapt installation status and cluster health
-**Implementation**: Check CRD existence and cluster connectivity
-**Priority**: Medium
+### Phase 4: Enterprise Features (Low Priority)
+- [ ] **Web UI**
+  - Web-based tool management interface
+  - Real-time job monitoring dashboard
+  - User management and permissions
+  - Audit logging and compliance
 
-### 6. **`rapt logs <tool-name>`** - View Job Logs
-```bash
-rapt logs <tool-name> [--follow] [--namespace <ns>]
-```
-**Purpose**: Show logs from tool executions
-**Implementation**: Get logs from Kubernetes Jobs
-**Priority**: Medium
+- [ ] **Integration & Automation**
+  - CI/CD pipeline integration
+  - Webhook support for job triggers
+  - API for external tool integration
+  - Kubernetes operator for advanced automation
 
-## 🔧 Core Implementation Requirements
+- [ ] **Scalability & Performance**
+  - Multi-cluster support
+  - Job scheduling optimization
+  - Resource pooling and sharing
+  - High availability features
 
-### **Job Management System** (Most Critical)
-- [ ] Create Kubernetes Jobs from Tool definitions
-- [ ] Handle job lifecycle (creation, monitoring, cleanup)
-- [ ] Support job arguments and environment variables
-- [ ] Implement job status tracking
-- [ ] Add job resource limits and requests
-- [ ] Handle job failures and retries
+## 🔧 Technical Debt & Improvements
 
-### **Tool Validation**
-- [ ] Validate tool definitions before creation
-- [ ] Check image availability and accessibility
-- [ ] Validate argument formats and requirements
-- [ ] Add comprehensive input validation
+### Code Quality
+- [ ] Comprehensive test coverage
+- [ ] Integration tests with real Kubernetes clusters
+- [ ] Performance benchmarking
+- [ ] Code documentation improvements
 
-### **Error Handling**
-- [ ] Comprehensive error messages
-- [ ] Graceful failure handling
-- [ ] User-friendly error reporting
-- [ ] Proper exit codes
+### Error Handling
+- [ ] Enhanced error messages with actionable suggestions
+- [ ] Graceful degradation for cluster connectivity issues
+- [ ] Better handling of edge cases and failures
+- [ ] User-friendly troubleshooting guides
 
-## 📊 MVP Priority Order
+### Documentation
+- [ ] API documentation
+- [ ] Advanced usage examples
+- [ ] Best practices guide
+- [ ] Video tutorials and demos
 
-1. **`rapt run`** - Core functionality (execute tools) ⭐ **CRITICAL**
-2. **`rapt list`** - Basic tool management
-3. **`rapt delete`** - Tool lifecycle management
-4. **`rapt describe`** - Tool inspection
-5. **`rapt status`** - System health check
-6. **`rapt logs`** - Debugging and monitoring
+## 🎯 Success Metrics
 
-## 🎯 MVP Success Criteria
+### User Adoption
+- [ ] Community feedback and contributions
+- [ ] Usage analytics and metrics
+- [ ] User testimonials and case studies
+- [ ] Integration with popular Kubernetes distributions
 
-The project will be considered MVP-ready when users can:
-
-1. ✅ **Initialize** Rapt in a cluster (`rapt init`)
-2. ✅ **Add** tool definitions (`rapt add`)
-3. ⏳ **List** available tools (`rapt list`)
-4. ⏳ **Execute** tools (`rapt run <tool-name>`) ⭐ **CRITICAL**
-5. ⏳ **View** tool details (`rapt describe <tool-name>`)
-6. ⏳ **Remove** tools (`rapt delete <tool-name>`)
-7. ⏳ **Check** system status (`rapt status`)
-8. ⏳ **View** execution logs (`rapt logs <tool-name>`)
-
-## 🏗️ Implementation Plan
-
-### Phase 1: Core Execution (Critical Path)
-- [ ] Implement `rapt run` command
-- [ ] Create job management system
-- [ ] Add basic error handling
-- [ ] Test with simple tools
-
-### Phase 2: Tool Management
-- [ ] Implement `rapt list` command
-- [ ] Implement `rapt delete` command
-- [ ] Add tool validation
-
-### Phase 3: Monitoring & Debugging
-- [ ] Implement `rapt describe` command
-- [ ] Implement `rapt status` command
-- [ ] Implement `rapt logs` command
-
-### Phase 4: Polish & Testing
-- [ ] Comprehensive error handling
-- [ ] Input validation
-- [ ] Integration tests
-- [ ] Documentation updates
-
-## 🔍 Technical Considerations
-
-### Job Management
-- Use Kubernetes Jobs API for tool execution
-- Implement proper job cleanup (TTL, garbage collection)
-- Handle job status and completion
-- Support job arguments and environment variables
-
-### Kubernetes Integration
-- Proper RBAC permissions for job creation
-- Namespace handling and isolation
-- Resource limits and requests
-- Security contexts
-
-### User Experience
-- Clear command syntax and help text
-- Consistent error messages
-- Progress indicators for long-running operations
-- Tab completion support
-
-## 📝 Notes
-
-- The **most critical missing piece** is the **`rapt run`** command, which is the core value proposition
-- Focus on getting basic tool execution working before adding advanced features
-- Ensure proper error handling and user feedback throughout
-- Test thoroughly with various tool types and scenarios
+### Technical Excellence
+- [ ] Performance benchmarks
+- [ ] Security audit and compliance
+- [ ] Reliability and uptime metrics
+- [ ] Code quality and maintainability scores
 
 ---
 
 **Last Updated**: January 2025  
-**Status**: Planning Phase  
-**Next Milestone**: Implement `rapt run` command
+**Status**: Post-MVP Development Phase  
+**Next Milestone**: Enhanced monitoring with `rapt logs` command
