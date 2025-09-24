@@ -31,7 +31,6 @@ import (
 
 // Add command flags
 var (
-	addName    string
 	addImage   string
 	addCommand string
 	addEnv     []string
@@ -39,16 +38,17 @@ var (
 
 // addCmd represents the add command
 var addCmd = &cobra.Command{
-	Use:   "add",
+	Use:   "add <tool-name>",
 	Short: "Add a new tool definition to your Kubernetes cluster.",
 	Long: `Add a tool (containerized job/command) to the Rapt system in your Kubernetes cluster.
 
 This command registers a new tool by specifying its container image, the command to run inside the image, and (optionally) a set of environment variables.
 
 Examples:
-  rapt add -t lstool -i alpine --command "ls -la"
-  rapt add --name echo --image busybox -e FOO=bar -e BAZ=qux --command "echo $FOO $BAZ"
+  rapt add lstool -i alpine --command "ls -la"
+  rapt add echo --image busybox -e FOO=bar -e BAZ=qux --command "echo $FOO $BAZ"
 `,
+	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, e := range addEnv {
 			parts := strings.SplitN(e, "=", 2)
@@ -56,15 +56,14 @@ Examples:
 				return errors.New("each --env/-e argument must be in NAME=VALUE format")
 			}
 		}
-		return rapt.Add(namespace, addName, addImage, addCommand, addEnv)
+		toolName := args[0]
+		return rapt.Add(namespace, toolName, addImage, addCommand, addEnv)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(addCmd)
 
-	addCmd.Flags().StringVarP(&addName, "name", "t", "", "(Required) Tool name.")
-	addCmd.MarkFlagRequired("name")
 	addCmd.Flags().StringVarP(&addImage, "image", "i", "", "(Required) Container image to run.")
 	addCmd.MarkFlagRequired("image")
 	addCmd.Flags().StringVarP(&addCommand, "command", "c", "", "Command to run (overrides ENTRYPOINT). Specify as a single string.")
