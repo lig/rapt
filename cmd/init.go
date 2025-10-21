@@ -26,6 +26,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var initDryRun bool
+
 // initCmd represents the init command
 var initCmd = &cobra.Command{
 	Use:   "init",
@@ -34,10 +36,11 @@ var initCmd = &cobra.Command{
 
 This command sets up the necessary CRD so that Rapt can manage and orchestrate predefined jobs (commands) in your cluster. Run this command once per cluster before using other Rapt features.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return rapt.InitCmd(namespace)
+		return rapt.InitCmd(namespace, initDryRun)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(initCmd)
+	initCmd.Flags().BoolVar(&initDryRun, "dry-run", false, "Print the CRD YAML without applying it to the cluster")
 }

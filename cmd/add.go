@@ -34,6 +34,7 @@ var (
 	addImage   string
 	addCommand string
 	addEnv     []string
+	addDryRun  bool
 )
 
 // addCmd represents the add command
@@ -57,7 +58,7 @@ Examples:
 			}
 		}
 		toolName := args[0]
-		return rapt.Add(namespace, toolName, addImage, addCommand, addEnv)
+		return rapt.Add(namespace, toolName, addImage, addCommand, addEnv, addDryRun)
 	},
 }
 
@@ -68,4 +69,5 @@ func init() {
 	addCmd.MarkFlagRequired("image")
 	addCmd.Flags().StringVarP(&addCommand, "command", "c", "", "Command to run (overrides ENTRYPOINT). Specify as a single string.")
 	addCmd.Flags().StringArrayVarP(&addEnv, "env", "e", nil, "Environment variable in the form NAME=VALUE. Can be specified multiple times.")
+	addCmd.Flags().BoolVar(&addDryRun, "dry-run", false, "Print the Tool CR YAML without applying it to the cluster")
 }

@@ -13,19 +13,13 @@ import (
 )
 
 // Add registers a new tool definition in the Kubernetes cluster.
-func Add(namespace, name, image, command string, env []string) error {
+func Add(namespace, name, image, command string, env []string, dryRun bool) error {
 	// Validate required fields
 	if name == "" {
 		return fmt.Errorf("tool name is required")
 	}
 	if image == "" {
 		return fmt.Errorf("container image is required")
-	}
-
-	// Initialize dynamic client
-	dynClient, err := k8s.InitDynamicClient(namespace)
-	if err != nil {
-		return err
 	}
 
 	// Prepare env variables for the Tool spec
@@ -64,6 +58,17 @@ func Add(namespace, name, image, command string, env []string) error {
 				"jobTemplate": jobTemplate,
 			},
 		},
+	}
+
+	// If dry-run mode, print YAML and exit
+	if dryRun {
+		return k8s.PrintToolYAML(tool)
+	}
+
+	// Initialize dynamic client
+	dynClient, err := k8s.InitDynamicClient(namespace)
+	if err != nil {
+		return err
 	}
 
 	gvr := schema.GroupVersionResource{
