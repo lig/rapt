@@ -50,14 +50,17 @@ func ListTools(namespace, outputFormat string, allNamespaces bool) error {
 		return fmt.Errorf("failed to initialize dynamic client: %w", err)
 	}
 
+	// If no namespace was provided, treat it as all namespaces
+	showAllNamespaces := allNamespaces || namespace == ""
+
 	// Get tools
-	tools, err := getTools(dynClient, namespace, allNamespaces)
+	tools, err := getTools(dynClient, namespace, showAllNamespaces)
 	if err != nil {
 		return fmt.Errorf("failed to get tools: %w", err)
 	}
 
 	if len(tools) == 0 {
-		if allNamespaces {
+		if showAllNamespaces {
 			fmt.Println("No tools found in any namespace.")
 		} else {
 			fmt.Printf("No tools found in namespace '%s'.\n", namespace)
@@ -84,7 +87,7 @@ func ListTools(namespace, outputFormat string, allNamespaces bool) error {
 	case "table":
 		fallthrough
 	default:
-		return outputTable(toolInfos, allNamespaces)
+		return outputTable(toolInfos, showAllNamespaces)
 	}
 }
 
