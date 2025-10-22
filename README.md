@@ -43,15 +43,25 @@ go install codeberg.org/lig/rapt@latest
 
 2. **Add a tool definition**:
    ```bash
-   rapt add my-tool --image alpine:latest --command "echo hello world"
+   rapt add echo-tool --image alpine:latest --command "echo Hello from Rapt!"
    ```
 
-3. **Run a tool**:
+3. **List available tools**:
    ```bash
-   rapt run my-tool
+   rapt list
    ```
 
-4. **Clean up**:
+4. **Run the tool**:
+   ```bash
+   rapt run echo-tool
+   ```
+
+5. **View tool details**:
+   ```bash
+   rapt describe echo-tool
+   ```
+
+6. **Clean up**:
    ```bash
    rapt purge
    ```
@@ -73,11 +83,96 @@ rapt add <tool-name> [flags]
 ```
 
 **Flags:**
-- `--image`: Container image to run
-- `--command`: Command to execute (overrides ENTRYPOINT)
-- `--env`: Environment variables (format: KEY=VALUE)
-- `--help-text`: Help message for the tool
-- `--arg`: Tool arguments (format: name:description:required:default)
+- `-i, --image`: (Required) Container image to run
+- `-c, --command`: Command to execute (overrides ENTRYPOINT). Specify as a single string.
+- `-e, --env`: Environment variables in the form NAME=VALUE. Can be specified multiple times.
+- `--dry-run`: Print the Tool CR YAML without applying it to the cluster
+
+**Examples:**
+```bash
+# Simple tool
+rapt add lstool --image alpine:latest --command "ls -la"
+
+# Tool with environment variables
+rapt add echo --image busybox -e FOO=bar -e BAZ=qux --command "echo \$FOO \$BAZ"
+
+# Preview without creating
+rapt add my-tool --image alpine:latest --command "whoami" --dry-run
+```
+
+### `rapt run`
+Execute a tool by creating a Kubernetes Job from the tool definition.
+
+```bash
+rapt run <tool-name> [flags]
+```
+
+**Flags:**
+- `-a, --arg`: Tool argument in the form key=value. Can be specified multiple times.
+- `-e, --env`: Environment variable in the form key=value. Can be specified multiple times.
+- `-m, --mount`: Mount local file into container in the form local-path:container-path. Can be specified multiple times.
+- `-w, --wait`: Wait for the job to complete before exiting
+- `-f, --follow`: Follow job logs in real-time (default behavior)
+- `-t, --timeout`: Timeout in seconds when waiting for job completion (default: 300)
+
+**Examples:**
+```bash
+# Run a simple tool
+rapt run echo-tool
+
+# Run with environment variables
+rapt run my-tool --env DEBUG=true
+
+# Run with file mounts
+rapt run script-runner --mount ./script.sh:/app/script.sh --mount ./config.yaml:/etc/config.yaml
+
+# Run and wait for completion
+rapt run data-processor --wait --timeout 600
+```
+
+**Note**: By default, logs are streamed in real-time, making it feel like running a local command.
+
+### `rapt list`
+List all available tools in the cluster.
+
+```bash
+rapt list [flags]
+```
+
+**Flags:**
+- `-o, --output`: Output format: table, json, yaml (default: table)
+- `-A, --all-namespaces`: List tools from all namespaces
+
+### `rapt describe`
+Show detailed information about a specific tool.
+
+```bash
+rapt describe <tool-name> [flags]
+```
+
+**Flags:**
+- `-o, --output`: Output format: table, json, yaml (default: table)
+
+### `rapt logs`
+View logs from previous job executions.
+
+```bash
+rapt logs <tool-name> [job-name]
+```
+
+### `rapt status`
+Check the status of jobs created from a tool.
+
+```bash
+rapt status <tool-name>
+```
+
+### `rapt delete`
+Delete a tool definition from the cluster.
+
+```bash
+rapt delete <tool-name>
+```
 
 ### `rapt purge`
 Remove the Rapt CRD and all associated resources from your Kubernetes cluster.
@@ -89,6 +184,8 @@ rapt purge [--namespace <namespace>]
 ⚠️ **Warning**: This operation is destructive and cannot be undone.
 
 ## Tool Definition Schema
+
+**Note**: The schema below is for direct Kubernetes resource creation using `kubectl` or for understanding the underlying CRD structure. When using `rapt add`, you don't need to write YAML manually - the tool creates it for you. However, `rapt add` currently has limited support for defining tool arguments and help text. For complex tools with arguments, you may need to create the YAML file directly and apply it with `kubectl apply -f tool.yaml`.
 
 Tools are defined using Kubernetes Custom Resources with the following schema:
 
@@ -117,26 +214,86 @@ spec:
 
 ## Examples
 
-### Simple Echo Tool
+### Example 1: Simple Echo Tool
+
+**Step 1: Add the tool**
 ```bash
 rapt add echo-tool \
   --image alpine:latest \
-  --command "echo" \
-  --arg "message:Message to echo:true:" \
-  --help-text "Echo a message"
+  --command "echo Hello from echo-tool"
 ```
 
-### Database Migration Tool
+**Step 2: Run the tool**
 ```bash
-rapt add db-migrate \
+rapt run echo-tool
+```
+
+**Step 3: View tool details**
+```bash
+rapt describe echo-tool
+```
+
+### Example 2: Tool with Environment Variables
+
+**Step 1: Add the tool**
+```bash
+rapt add greeter \
+  --image alpine:latest \
+  --command "sh -c 'echo Hello \$NAME, welcome to \$PLACE'" \
+  --env "NAME=User" \
+  --env "PLACE=Kubernetes"
+```
+
+**Step 2: Run with default environment**
+```bash
+rapt run greeter
+```
+
+**Step 3: Run with custom environment variables**
+```bash
+rapt run greeter --env NAME=Alice --env PLACE=Production
+```
+
+### Example 3: File Processing Tool
+
+**Step 1: Add the tool**
+```bash
+rapt add file-processor \
+  --image alpine:latest \
+  --command "sh -c 'cat /data/input.txt && echo Processed > /data/output.txt'"
+```
+
+**Step 2: Run with mounted files**
+```bash
+echo "Sample content" > input.txt
+rapt run file-processor \
+  --mount ./input.txt:/data/input.txt \
+  --mount ./output.txt:/data/output.txt
+```
+
+**Step 3: Check the output**
+```bash
+cat output.txt
+```
+
+### Example 4: Database Tool
+
+**Step 1: Add the tool**
+```bash
+rapt add db-query \
   --image postgres:15 \
   --command "psql" \
-  --env "PGHOST=db-service" \
-  --env "PGUSER=migrator" \
-  --arg "database:Database name:true:" \
-  --arg "script:Migration script path:true:" \
-  --help-text "Run database migrations"
+  --env "PGHOST=db-service.default.svc.cluster.local" \
+  --env "PGUSER=readonly" \
+  --env "PGDATABASE=mydb"
 ```
+
+**Step 2: Run the tool**
+```bash
+rapt run db-query --env PGPASSWORD=secret
+```
+
+For more examples, see the [examples/](examples/) directory.
 
 ## Development
 
@@ -157,13 +314,6 @@ go build -o rapt main.go
 ```bash
 go test ./...
 ```
-
-### Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
 
 ## License
 
